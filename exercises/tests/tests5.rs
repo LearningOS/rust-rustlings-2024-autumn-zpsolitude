@@ -22,7 +22,6 @@
 // Execute `rustlings hint tests5` or use the `hint` watch subcommand for a
 // hint.
 
-// I AM NOT DONE
 
 /// # Safety
 ///
@@ -32,7 +31,16 @@ unsafe fn modify_by_address(address: usize) {
     // code's behavior and the contract of this function. You may use the
     // comment of the test below as your format reference.
     unsafe {
-        todo!("Your code goes here")
+        let ptr: *mut u32 = address as *mut u32;
+
+        // Ensure the pointer is valid before dereferencing.
+        if !ptr.is_null() {
+            // Dereference the pointer and set the value.
+            // SAFETY: The caller guarantees that the pointer is valid and points to a mutable u32.
+            unsafe {
+                *ptr = 0xAABBCCDD;
+            }
+        }
     }
 }
 
