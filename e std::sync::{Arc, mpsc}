@@ -1,0 +1,86 @@
+[1mdiff --git a/exercises/threads/threads2.rs b/exercises/threads/threads2.rs[m
+[1mindex 62dad80..d593fe9 100644[m
+[1m--- a/exercises/threads/threads2.rs[m
+[1m+++ b/exercises/threads/threads2.rs[m
+[36m@@ -7,9 +7,8 @@[m
+ // Execute `rustlings hint threads2` or use the `hint` watch subcommand for a[m
+ // hint.[m
+ [m
+[31m-// I AM NOT DONE[m
+ [m
+[31m-use std::sync::Arc;[m
+[32m+[m[32muse std::sync::{Arc, Mutex};[m
+ use std::thread;[m
+ use std::time::Duration;[m
+ [m
+[36m@@ -18,14 +17,15 @@[m [mstruct JobStatus {[m
+ }[m
+ [m
+ fn main() {[m
+[31m-    let status = Arc::new(JobStatus { jobs_completed: 0 });[m
+[32m+[m[32m    let status = Arc::new(Mutex::new(JobStatus { jobs_completed: 0 }));[m
+     let mut handles = vec![];[m
+     for _ in 0..10 {[m
+         let status_shared = Arc::clone(&status);[m
+         let handle = thread::spawn(move || {[m
+             thread::sleep(Duration::from_millis(250));[m
+             // TODO: You must take an action before you update a shared value[m
+[31m-            status_shared.jobs_completed += 1;[m
+[32m+[m[32m            let mut status = status_shared.lock().unwrap();[m
+[32m+[m[32m            status.jobs_completed += 1;[m
+         });[m
+         handles.push(handle);[m
+     }[m
+[36m@@ -34,6 +34,7 @@[m [mfn main() {[m
+         // TODO: Print the value of the JobStatus.jobs_completed. Did you notice[m
+         // anything interesting in the output? Do you have to 'join' on all the[m
+         // handles?[m
+[31m-        println!("jobs completed {}", ???);[m
+[32m+[m[32m        let status = status.lock().unwrap();[m
+[32m+[m[32m        println!("jobs completed {}", status.jobs_completed);[m
+     }[m
+ }[m
+[1mdiff --git a/exercises/threads/threads3.rs b/exercises/threads/threads3.rs[m
+[1mindex db7d41b..9d5004e 100644[m
+[1m--- a/exercises/threads/threads3.rs[m
+[1m+++ b/exercises/threads/threads3.rs[m
+[36m@@ -5,8 +5,7 @@[m
+ [m
+ // I AM NOT DONE[m
+ [m
+[31m-use std::sync::mpsc;[m
+[31m-use std::sync::Arc;[m
+[32m+[m[32muse std::sync::{Arc, mpsc};[m
+ use std::thread;[m
+ use std::time::Duration;[m
+ [m
+[36m@@ -26,8 +25,7 @@[m [mimpl Queue {[m
+     }[m
+ }[m
+ [m
+[31m-fn send_tx(q: Queue, tx: mpsc::Sender<u32>) -> () {[m
+[31m-    let qc = Arc::new(q);[m
+[32m+[m[32mfn send_tx(qc: Arc<Queue>, tx: mpsc::Sender<u32>) {[m
+     let qc1 = Arc::clone(&qc);[m
+     let qc2 = Arc::clone(&qc);[m
+ [m
+[36m@@ -53,7 +51,9 @@[m [mfn main() {[m
+     let queue = Queue::new();[m
+     let queue_length = queue.length;[m
+ [m
+[31m-    send_tx(queue, tx);[m
+[32m+[m[32m    // 创建一个 Arc<Queue>，传递给 send_tx 函数[m
+[32m+[m[32m    let qc = Arc::new(queue);[m
+[32m+[m[32m    send_tx(Arc::clone(&qc), tx);[m
+ [m
+     let mut total_received: u32 = 0;[m
+     for received in rx {[m
+[36m@@ -62,5 +62,5 @@[m [mfn main() {[m
+     }[m
+ [m
+     println!("total numbers received: {}", total_received);[m
+[31m-    assert_eq!(total_received, queue_length)[m
+[31m-}[m
+[32m+[m[32m    assert_eq!(total_received, queue_length);[m
+[32m+[m[32m}[m
+\ No newline at end of file[m
