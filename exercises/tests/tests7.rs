@@ -34,14 +34,14 @@
 // Execute `rustlings hint tests7` or use the `hint` watch subcommand for a
 // hint.
 
-// I AM NOT DONE
-
+#![allow(unused_imports)]
 fn main() {}
 
 #[cfg(test)]
 mod tests {
-    //use super::*;
+    use super::*;
 
+    
     #[test]
     fn test_success() {
         let timestamp = std::time::SystemTime::now()
@@ -50,6 +50,7 @@ mod tests {
             .as_secs();
         let s = std::env::var("TEST_FOO").unwrap();
         let e: u64 = s.parse().unwrap();
+        println!("{}{}",timestamp,e);
         assert!(timestamp >= e && timestamp < e + 10);
     }
 }
